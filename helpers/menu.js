@@ -47,7 +47,6 @@ const ejecutarMenu = async () => {
       const tareasListadas = await manager.listarTareas();
       console.log("Listado de tareas:".blue);
       console.log(tareasListadas);
-     /*  tareasListadas.forEach((tarea, index) => console.log(`${index + 1}. ${tarea}`)); */
     } else if (opcion === "3") {
 const tareasCompletas = await manager.listarTareasCompletas();
         console.log("Listado de tareas completas:".blue);
@@ -56,19 +55,32 @@ const tareasCompletas = await manager.listarTareasCompletas();
         const tareasPendientes = await manager.listarTareasPendientes();
         console.log("Listado de tareas pendientes:".blue);
         console.log(tareasPendientes);
-
-
-
-    }  else if (opcion === "6") {
+    } else if (opcion === "5") {
+        const tareacomp = await manager.listarTareasPendientes();
+        const { idTarea } = await inquirer.default.prompt([{
+          type: "list",
+          name: "idTarea",
+          message: "Seleccione la tarea a completar:",
+          choices: tareacomp.map((tarea, index) => ({ 
+            value: tarea.id,  // Obtén el id de la tarea
+            name: `${index + 1}. ${tarea.descripcion}` 
+          })),
+        }]);
+        await manager.cambiarEstadoTarea(idTarea);
+        console.log("Tarea completada con exito.".green);
+    } else if (opcion === "6") {
       const tareasBorrar = await manager.listarTareas();
-      const { indiceTarea } = await inquirer.default.prompt([{
-        type: "list",
-        name: "indiceTarea",
-        message: "Seleccione la tarea a borrar:",
-        choices: tareasBorrar.map((tarea, index) => ({ value: index, name: `${index + 1}. ${tarea}` })),
-      }]);
-      await manager.borrarTarea(indiceTarea);
-      console.log("Tarea borrada correctamente.".green);
+const { idTarea } = await inquirer.default.prompt([{
+  type: "list",
+  name: "idTarea",
+  message: "Seleccione la tarea a borrar:",
+  choices: tareasBorrar.map((tarea, index) => ({ 
+    value: tarea.id,  // Obtén el id de la tarea
+    name: `${index + 1}. ${tarea.descripcion}` 
+  })),
+}]);
+await manager.borrarTarea(idTarea);
+console.log("Tarea borrada correctamente.".green);
     } else if (opcion === "0") {
       console.log("Saliendo...".blue);
       process.exit();

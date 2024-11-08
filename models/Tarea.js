@@ -54,15 +54,24 @@ class TareaManager {
         }));
     }
 
-    borrarTarea(id) {
-        const index = this.tareas.findIndex(tarea => tarea.id === id);
-        if (index === -1) {
-            console.log("Índice inválido.");
-            return;
-        }
-        const tareaBorrada = this.tareas.splice(index, 1);
-        console.log(`Tarea borrada: ${tareaBorrada[0].descripcion}`);
-    }
+        borrarTarea(id) {
+            const index = this.tareas.findIndex(tarea => tarea.id === id);
+            if (index === -1) {
+              console.log("Índice inválido.");
+              return;
+            }
+            const tareaBorrada = this.tareas.splice(index, 1);
+          }
+
+
+          cambiarEstadoTarea(id) {
+            const index = this.tareas.findIndex(tarea => tarea.id === id);
+            if (index === -1) {
+              console.log("Índice inválido.");
+              return;
+            }
+            this.tareas[index].estado = true;  // Cambia el estado a true
+          }   
 }
 
 module.exports = TareaManager;
