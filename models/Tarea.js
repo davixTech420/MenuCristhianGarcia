@@ -1,25 +1,68 @@
-const fs = require("fs");
-const archivoJson = "tareas.json";
+const { v4: uuidv4 } = require('uuid');
 
-// Inicializa el archivo JSON si no existe
-if (!fs.existsSync(archivoJson)) fs.writeFileSync(archivoJson, JSON.stringify({ tareas: [] }));
+class Tarea {
+    constructor(descripcion) {
+        this.id = uuidv4(); // Genera un ID único
+        this.descripcion = descripcion;
+        this.estado = false; // Estado inicial de la tarea
+    }
+}
 
-const leerTareas = () => JSON.parse(fs.readFileSync(archivoJson));
+class TareaManager {
+    constructor() {
+        this.tareas = []; // Almacena las tareas en memoria
+    }
 
-const escribirTareas = (tareas) => fs.writeFileSync(archivoJson, JSON.stringify(tareas));
+    crearTarea(descripcion) {
+        const nuevaTarea = new Tarea(descripcion);
+       return this.tareas.push(nuevaTarea);
+    }
 
-const crearTarea = async (tarea) => {
-    const tareas = leerTareas();
-    tareas.tareas.push(tarea);
-    escribirTareas(tareas);
-};
+    
+    listarTareasPendientes() {
+        if (this.tareas.length === 0) {
+            console.log("No hay tareas disponibles.");
+            return;
+        }
+        return this.tareas.filter(tarea => !tarea.estado).map(tarea => ({
+            id: tarea.id,
+            descripcion: tarea.descripcion,
+            estado: tarea.estado
+        }));
+    }
 
-const listarTareas = async () => leerTareas().tareas;
+    listarTareas() {
+        if (this.tareas.length === 0) {
+            console.log("No hay tareas disponibles.");
+            return;
+        }
+        return this.tareas.map(tarea => ({
+            id: tarea.id,
+            descripcion: tarea.descripcion,
+            estado: tarea.estado
+        }));
+    }
+    listarTareasCompletas() {
+        if (this.tareas.length === 0) {
+            console.log("No hay tareas disponibles.");
+            return;
+        }
+        return this.tareas.filter(tarea => tarea.estado).map(tarea => ({
+            id: tarea.id,
+            descripcion: tarea.descripcion,
+            estado: tarea.estado
+        }));
+    }
 
-const borrarTarea = async (indice) => {
-    const tareas = leerTareas();
-    tareas.tareas.splice(indice, 1);
-    escribirTareas(tareas);
-};
+    borrarTarea(id) {
+        const index = this.tareas.findIndex(tarea => tarea.id === id);
+        if (index === -1) {
+            console.log("Índice inválido.");
+            return;
+        }
+        const tareaBorrada = this.tareas.splice(index, 1);
+        console.log(`Tarea borrada: ${tareaBorrada[0].descripcion}`);
+    }
+}
 
-module.exports = { crearTarea, listarTareas, borrarTarea };
+module.exports = TareaManager;
