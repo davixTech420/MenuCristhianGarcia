@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
 
 class Tarea {
@@ -10,15 +11,31 @@ class Tarea {
 
 class TareaManager {
     constructor() {
-        this.tareas = []; // Almacena las tareas en memoria
+        this.archivo = "./db/db.json"; // Ruta del archivo JSON
+        this.cargarTareas(); // Carga las tareas desde el archivo JSON
     }
+
+    cargarTareas() {
+        try {
+            const data = fs.readFileSync(this.archivo, 'utf8');
+            this.tareas = JSON.parse(data);
+        } catch (error) {
+            this.tareas = []; // Si no existe el archivo, inicializa un array vacío
+        }
+    }
+
+    guardarTareas() {
+        const data = JSON.stringify(this.tareas);
+        fs.writeFileSync(this.archivo, data);
+    }
+
 
     crearTarea(descripcion) {
         const nuevaTarea = new Tarea(descripcion);
-       return this.tareas.push(nuevaTarea);
+        this.tareas.push(nuevaTarea);
+        this.guardarTareas();
     }
 
-    
     listarTareasPendientes() {
         if (this.tareas.length === 0) {
             console.log("No hay tareas disponibles.");
@@ -42,6 +59,7 @@ class TareaManager {
             estado: tarea.estado
         }));
     }
+
     listarTareasCompletas() {
         if (this.tareas.length === 0) {
             console.log("No hay tareas disponibles.");
@@ -54,24 +72,25 @@ class TareaManager {
         }));
     }
 
-        borrarTarea(id) {
-            const index = this.tareas.findIndex(tarea => tarea.id === id);
-            if (index === -1) {
-              console.log("Índice inválido.");
-              return;
-            }
-            const tareaBorrada = this.tareas.splice(index, 1);
-          }
+    borrarTarea(id) {
+        const index = this.tareas.findIndex(tarea => tarea.id === id);
+        if (index === -1) {
+            console.log("Índice inválido.");
+            return;
+        }
+        this.tareas.splice(index, 1);
+        this.guardarTareas();
+    }
 
-
-          cambiarEstadoTarea(id) {
-            const index = this.tareas.findIndex(tarea => tarea.id === id);
-            if (index === -1) {
-              console.log("Índice inválido.");
-              return;
-            }
-            this.tareas[index].estado = true;  // Cambia el estado a true
-          }   
+    cambiarEstadoTarea(id) {
+        const index = this.tareas.findIndex(tarea => tarea.id === id);
+        if (index === -1) {
+            console.log("Índice inválido.");
+            return;
+        }
+        this.tareas[index].estado = true; // Cambia el estado a true
+        this.guardarTareas();
+    }
 }
 
-module.exports = TareaManager;
+module.exports = TareaManager; 
